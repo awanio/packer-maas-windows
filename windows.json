@@ -1,0 +1,99 @@
+{
+  "builders": [
+    {
+      "accelerator": "kvm",
+      "boot_wait": "0s",
+      "communicator": "winrm",
+      "cpus": 2,
+      "disk_size": "{{user `disk_size`}}",
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "./scripts/disable-screensaver.ps1",
+        "./scripts/disable-winrm.ps1",
+        "./scripts/enable-winrm.ps1",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/unattend.xml",
+        "./scripts/sysprep.bat",
+        "./scripts/win-updates.ps1"
+      ],
+      "headless": true,
+      "iso_checksum": "none",
+      "iso_url": "{{user `iso_url`}}",
+      "memory": "{{user `memory`}}",
+      "output_directory": "{{user `output_path`}}",
+      "qemuargs": [
+        [
+          "-drive",
+          "file={{user `output_path`}}/{{ .Name }},if=virtio,cache=writeback,discard=ignore,format=raw,index=1"
+        ],
+        [
+          "-drive",
+          "file={{ user `iso_url` }},media=cdrom,index=2"
+        ],
+        [
+          "-drive",
+          "file={{ user `virtio_win_iso` }},media=cdrom,index=3"
+        ]
+      ],
+      "shutdown_command": "a:/sysprep.bat",
+      "type": "qemu",
+      "vm_name": "WindowsServer2019",
+      "winrm_password": "cloud-user",
+      "winrm_timeout": "{{user `winrm_timeout`}}",
+      "winrm_username": "cloud-user",
+      "format": "raw"
+    }
+  ],
+  "post-processors": [
+    {
+      "keep_input_artifact": true,
+      "type": "compress",
+      "output": "{{user `output_path`}}/{{user `output_filename`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "./scripts/enable-rdp.bat"
+      ],
+      "type": "windows-shell"
+    },
+    {
+      "scripts": [
+        "./scripts/vm-guest-tools.ps1",
+        "./scripts/debloat-windows.ps1"
+      ],
+      "type": "powershell"
+    },
+    {
+      "restart_timeout": "{{user `restart_timeout`}}",
+      "type": "windows-restart"
+    },
+    {
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "./scripts/pin-powershell.bat",
+        "./scripts/set-winrm-automatic.bat",
+        "./scripts/uac-enable.bat",
+        "./scripts/compile-dotnet-assemblies.bat",
+        "./scripts/dis-updates.bat",
+        "./scripts/compact.bat",
+        "./scripts/cloudbase-init-curtin.bat"
+      ],
+      "type": "windows-shell"
+    }
+  ],
+  "variables": {
+    "output_path": "windows-2019",
+    "output_filename": "standard.tar.gz",
+    "autounattend": "./answer_files/2019/Autounattend.xml",
+    "disk_size": "40G",
+    "disk_type_id": "1",
+    "memory": "2048",
+    "iso_url": "./files/WINDOWS-ISO-FILE.iso",
+    "restart_timeout": "5m",
+    "virtio_win_iso": "./files/virtio-win.iso",
+    "winrm_timeout": "2h",
+  }
+}
