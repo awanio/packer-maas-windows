@@ -41,7 +41,8 @@
       "winrm_password": "cloud-user",
       "winrm_timeout": "{{user `winrm_timeout`}}",
       "winrm_username": "cloud-user",
-      "format": "raw"
+      "format": "raw",
+      "http_directory": "./files"
     }
   ],
   "post-processors": [
@@ -69,6 +70,11 @@
     {
       "restart_timeout": "{{user `restart_timeout`}}",
       "type": "windows-restart"
+    },
+    {
+      "type": "file",
+      "source": "app.tar.gz",
+      "destination": "/tmp/app.tar.gz"
     },
     {
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
