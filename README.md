@@ -40,5 +40,5 @@ create name=windows/win2019 \
 title='Windows Server 2019 Standard' \
 architecture=amd64/generic \
 filetype=ddtgz \
-content@=windows-server-2019.tar.gz
+content@=windows-2019/standard.tar.gz
 ```
