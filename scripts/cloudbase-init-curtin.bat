@@ -10,7 +10,7 @@ if not exist "C:\Windows\Temp\7z1900-x64.msi" (
 	msiexec /i C:\Windows\Temp\CloudbaseInitSetup_Stable_x64.msi /qn /l*v log.txt
 
 	pushd C:\Windows\Temp
-	powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; (New-Object System.Net.WebClient).DownloadFile('http://%HTTPIP%:%HTTPPort%/windows-curtin-hooks/tarball/master', 'C:\Windows\Temp\windows-curtin-hooks.tgz')" <NUL
+	powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; (New-Object System.Net.WebClient).DownloadFile('http://%HTTPIP%:%HTTPPort%/bb30d56', 'C:\Windows\Temp\windows-curtin-hooks.tgz')" <NUL
 	cmd /c ""C:\Program Files\7-Zip\7z.exe" x windows-curtin-hooks.tgz"
 	cmd /c ""C:\Program Files\7-Zip\7z.exe" x windows-curtin-hooks.tar"
 	pushd cloudbase-windows-curtin-hooks-bb30d56
